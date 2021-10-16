@@ -33,15 +33,17 @@ hold on;
 
 function v_n = NormalniVec(x,y)
 	f = @(x,y) sin(x.^2 - y.^4)./(x.^2 - y.^4);
+
+	% parcialni odvod f po x
 	f_x = @(x,y) 2.*x.*(cos(x.^2 - y.^4)./(x.^2 - y.^4) 
 	- sin(x.^2 - y.^4)./(x.^2 - y.^4).^2);
+
+	% parcialni odvod f po y
 	f_y = @(x,y) -4.*x.*(cos(x.^2 - y.^4)./(x.^2 - y.^4) - 
 	sin(x.^2 - y.^4)./(x.^2 - y.^4).^2);
 
 	v_x = [1; 0; f_x(x,y);];
 	v_y = [0; 1; f_y(x,y);];
-	quiver3([x; y;],[x; y;],[f(x,y); f(x,y);],[v_x(1); v_y(1);],[v_x(2); v_y(2);],[v_x(3); v_y(3);]);
-	hold on;
 
 	v_n = cross(v_x,v_y);
 	v_n = v_n/norm(v_n);
@@ -52,7 +54,9 @@ function v_n = NormalniVec(x,y)
 	end 
 end
 
-v_n = NormalniVec(.5,1)
+T_n = [.5; 1.65;];
+v_n = .5*NormalniVec(T_n(1),T_n(2))
 
-quiver3(.5,1,f(.5,1),v_n(1),v_n(1),v_n(1));
+daspect([1 1 1])
+quiver3(T_n(1),T_n(2),f(T_n(1),T_n(2)),v_n(1),v_n(2),v_n(3));
 hold off;
