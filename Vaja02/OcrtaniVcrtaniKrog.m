@@ -66,7 +66,7 @@ function [S,r] = ocrtana_kroznica(T)
 	P2 = simetrala(T(2,:),T(3,:));
 
 	S = presek_premic(P1,P2);
-	r = sqrt(norm(S-T(:,1)));
+	r = norm(S-T(1,:));
 	S = S';
 end
 
@@ -74,17 +74,16 @@ function p = simetrala_kota(A,V,B)
 	% ce sta tocki v napacnam polozaju, ju zamenjamo
 	vecA = A - V;
 	vecB = B - V;
-	if cross([vecA 0],[vecB 0])(3) < 0
-		tmp = vecA;
-		vecA = vecB;
-		vecB = tmp;
-	end
 
-	rotVec = vecA
+	rotVec = vecA;
 	% dot(vecA,vecB) = norm(vecA)*norm(vecB)*cos(phi)
 	% cos(phi) = dot(vecA,vecB)/(norm(vecA)*norm(vecB))
 	phi = acos(dot(vecA,vecB)/(norm(vecA)*norm(vecB)))/2;
-	phi
+	
+	if cross([vecA 0],[vecB 0])(3) < 0
+		phi = -phi;
+	end
+
 	rotMat = [
 		cos(phi) -sin(phi);
 		sin(phi)  cos(phi);
@@ -92,16 +91,35 @@ function p = simetrala_kota(A,V,B)
 	rotVec = (rotMat*rotVec')';
 	p = vec_to_premica(rotVec,V);
 end
+
+function d = razdalija_tocka_premica(P,T)
+	a = P(1);b = P(2);c = P(3);
+	if abs(b) < eps
+		d = abs(-c/a - T(1)); 
+	else
+		T_p = na_premici(P,0); % tocka na premici
+		T_p2 = na_premici(P,1);
+		vecPremica = T_p2 - T_p;
+
+		vecDoTocke = T - T_p;
+		vecProj = dot(vecDoTocke,vecPremica)/dot(vecPremica,vecPremica)*vecPremica;
+
+		najblizjaTocka = T_p + vecProj;
+		d = norm(najblizjaTocka - T);
+	end
+end
 	
 function [S,r] = vcrtana_kroznica(T);
 	% vcrtana_kroznica vrne sredisce in radij vcrtane kroznice
 	% [S,r]=vcrtana_kroznica(T) vrne sredisce in radij trikotniku T vcrtanega kroga
 	% T je podan kot 3x2 matrika tock: [x1 y1; x2 y2; x3 y3].
-	P1 = simetrala_kota(T(1,:),T(2,:),T(3,:));
-	P2 = simetrala_kota(T(2,:),T(3,:),T(1,:));
+	T_1 = T(1,:);T_2 = T(2,:);T_3 = T(3,:);
 
-	S = presek_premic(P1,P2);
-	r = sqrt(norm(S-T(:,1)));
+	P_1 = simetrala_kota(T_1,T_2,T_3);
+	P_2 = simetrala_kota(T_3,T_1,T_2);
+
+	S = presek_premic(P_1,P_2);
+	r = norm(razdalija_tocka_premica(vec_to_premica(T_2 - T_1,T_1),S));
 	S = S';
 end
 	
@@ -110,12 +128,54 @@ function risi_kroznici(T);
 	% skupaj s srediscema.
 	% Trikotnik T je podan kot matrika 3x2 tock,
 	% T= [ x1 y1; x2 y2; x3 y2]
+	T_1 = T(1,:);T_2 = T(2,:);T_3 = T(3,:);
+
+	v_12 = T_1 - T_2;
+	v_23 = T_2 - T_3;
+	v_31 = T_3 - T_1;
+
+	s = {
+		@(t) v_12(1)*t + T_2(1),@(t) v_12(2)*t + T_2(2);
+		@(t) v_23(1)*t + T_3(1),@(t) v_23(2)*t + T_3(2);
+		@(t) v_31(1)*t + T_1(1),@(t) v_31(2)*t + T_1(2);
+	};
+
+	hold on;
+	grid on;
+	param = linspace(0,1,10);
+	for i = 1:3
+		plot(s{i,1}(param),s{i,2}(param),"k","linewidth",3);
+	end 
+	plot(T(:,1),T(:,2),"r.","markersize",20);
+
+	[S_o,r_o] = ocrtana_kroznica(T);
+	[S_v,r_v] = vcrtana_kroznica(T);
+
+	phi = linspace(0,2*pi);
+	krog = {
+		@(S,r,t) r*cos(t) + S(1),@(S,r,t) r*sin(t) + S(2)
+	};
+
+	plot(S_o(1),S_o(2),"gx","markersize",10);
+	plot(krog{1}(S_o,r_o,phi),krog{2}(S_o,r_o,phi),"g","linewidth",2);
+
+	plot(S_v(1),S_v(2),"bx","markersize",10);
+	plot(krog{1}(S_v,r_v,phi),krog{2}(S_v,r_v,phi),"b","linewidth",2);
+	hold off;
 end
 
 tocke = [
 	0 2;
-	2 0;
 	-1 -1;
+	2 0;
 ];
-[S,r] = ocrtana_kroznica(tocke);
-[S,r] = vcrtana_kroznica(tocke)
+
+tocke1 = [
+	0 2;
+	0 0;
+	2 0;
+];
+figure 1;
+risi_kroznici(tocke);
+figure 2;
+risi_kroznici(tocke1);
