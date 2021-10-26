@@ -164,18 +164,18 @@ function risi_kroznici(T);
 	hold off;
 end
 
-tocke = [
+tocke1 = [
 	0 2;
 	-1 -1;
 	2 0;
 ];
 
-tocke1 = [
-	0 2;
-	0 0;
-	2 0;
+tocke2 = [
+	1 2;
+	3 1;
+	0 -1;
 ];
 figure 1;
-risi_kroznici(tocke);
-figure 2;
 risi_kroznici(tocke1);
+figure 2;
+risi_kroznici(tocke2);
