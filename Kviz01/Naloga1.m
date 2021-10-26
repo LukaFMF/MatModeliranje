@@ -1,6 +1,5 @@
-1;
 format long;
 
-f = @(x) log(4*x) - 5;
+f = @(x) log(5*x) - 4;
 
-najmanjsaNicla = fzero(f,3)
+najmanjsaNicla = fzero(f,15)

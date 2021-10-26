@@ -1,10 +1,8 @@
-1;
+minEksp(3,43)
+
 function n = minEksp(x,y)
     n = 1;
     while(x^n < y)
-        n++;
+        n = n + 1;
     end
 end
-
-
-minEksp(3,43)
