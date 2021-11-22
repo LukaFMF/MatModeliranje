@@ -1,25 +1,21 @@
-% a = (1:5)';
-% b = (1:6)'+10;
-% c = (-5:-1)';
-% f = sin(1:6)';
-% resi3(a,b,c,f)
+format long;
 
 % u'(0) = 0
 % u(R) = 0 
 f = @(r) 1+0*r;
 R = 5;
 n = 10;
-[r,u] = upogib_opne(f,R,n)
+[r,u] = upogib_opne(f,R,n);
 
 f = @(r) 1-r.^2;
 R = 2;
 n = 20;
-% [r,u] = upogib_opne(f,R,n);
+[r,u] = upogib_opne(f,R,n);
 
 f = @(r) sin(2*pi*r);
 R = 3;
 n = 50;
-% [r,u] = upogib_opne(f,R,n);
+[r,u] = upogib_opne(f,R,n);
 
 function [r,u] = upogib_opne(f,R,n)
 	% function [r,u] = upogib_opne(f,R,n)
@@ -33,27 +29,19 @@ function [r,u] = upogib_opne(f,R,n)
 	% uporabimo kompakten zapis matrike s 3 stolpci (resi3.m)
 	h = R/n;
 
-	r = (0:h:R)'
+	r = (0:h:R)';
 
-	desna = f(r(1:end-1)); % n
+	desna = f(r(1:end-1));
 
-	a = linspace(1,1,n-2)' - (1./(2*(2:n-1)))';
-	b = -2*linspace(1,1,n-1)';
-	c = [2;linspace(1,1,n-3)' + (1./(2*(2:n-2)))'];
-	% desna = f(r); % n
-
-	% a = linspace(1,1,n-1)' - (1./(2*(2:n)))';
-	% b = -2*linspace(1,1,n)';
-	% c = [2;linspace(1,1,n-2)' + (1./(2*(2:n-1)))'];
-	a
-	b
-	c
+	a = linspace(1,1,n-1)' - (1./(2*(1:n-1)))';
+	b = -2*linspace(1,1,n)';
+	c = [2;linspace(1,1,n-2)' + (1./(2*(1:n-2)))'];
 
 	u = resi3(a,b,c,h^2*desna);
-	% u = resi3(a,b,c,(R/n)^2*desna);
 	u = [u;0];
 
 	% narisi u(x,y) [neobvezni dodatek]
+
 
 end
 
