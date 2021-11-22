@@ -1,23 +1,21 @@
-format long;
-
 % u'(0) = 0
 % u(R) = 0 
 f = @(r) 1+0*r;
 R = 5;
 n = 10;
-[r,u] = upogib_opne(f,R,n);
+[r,u] = upogib_opne(f,R,n,1);
 
 f = @(r) 1-r.^2;
 R = 2;
 n = 20;
-[r,u] = upogib_opne(f,R,n);
+[r,u] = upogib_opne(f,R,n,2);
 
 f = @(r) sin(2*pi*r);
 R = 3;
 n = 50;
-[r,u] = upogib_opne(f,R,n);
+[r,u] = upogib_opne(f,R,n,3);
 
-function [r,u] = upogib_opne(f,R,n)
+function [r,u] = upogib_opne(f,R,n,fig)
 	% function [r,u] = upogib_opne(f,R,n)
 	%
 	% upogib_opne racuna obliko prereza opne, napete na krozno zanko
@@ -28,7 +26,6 @@ function [r,u] = upogib_opne(f,R,n)
 	% n je stevilo delilnih intervalov (indeksi: 0,1,2,...,n)
 	% uporabimo kompakten zapis matrike s 3 stolpci (resi3.m)
 	h = R/n;
-
 	r = (0:h:R)';
 
 	desna = f(r(1:end-1));
@@ -42,7 +39,15 @@ function [r,u] = upogib_opne(f,R,n)
 
 	% narisi u(x,y) [neobvezni dodatek]
 
+	phiPoints = 100;
+	phi = linspace(0,2*pi,phiPoints);
+	[pR,pPhi] = meshgrid(r,phi);
 
+	xx = pR.*cos(pPhi);
+	yy = pR.*sin(pPhi);
+	zz = repmat(u',phiPoints,1);
+	figure(fig);
+	surf(xx,yy,zz);
 end
 
 function x = resi3(a,b,c,f)
