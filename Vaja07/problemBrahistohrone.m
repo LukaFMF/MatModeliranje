@@ -1,6 +1,6 @@
 T1 = [1; 5];
 T2 = [7; 3];
-cas = brahistohrona(T1,T2,false)
+cas = brahistohrona(T1,T2,false);
 
 % kviz 
 format long;
@@ -45,12 +45,11 @@ function cas = brahistohrona(T1,T2,midpoint)
 	[theta,k] = poisciOpt_theta_k(nizja(1),nizja(2));
 	
 	% definiramo diskr. vrednosti parametricne krivulje v odvisnosti od parametra theta
-	x = @(th) k.^2*(th - sin(2*th)/2) + minus(1); 
-	y = @(th) -k.^2*sin(th).^2 + minus(2);
+	x = @(t) k.^2*(t - sin(2*t)/2) + minus(1); 
+	y = @(t) -k.^2*sin(t).^2 + minus(2);
 
 	if midpoint
-		srednja = (T2(2) - T1(2))/2;
-		srednja
+		srednja = (T2(2) + T1(2))/2;
 		th = linspace(0,theta,1000);
 		inx = 1;
 		najmanjsa = abs(y(th(1)) - srednja); 
@@ -64,8 +63,8 @@ function cas = brahistohrona(T1,T2,midpoint)
 	end
 
 	% narisemo krivuljo
-	th = linspace(0,theta);
-	plot(x(th),y(th));
+	t = linspace(0,theta/2); % theta = 2*t => t = theta/2
+	plot(x(t),y(t));
 	axis equal;grid on;
 	cas = k/sqrt(2*9.8)*theta;
 end
