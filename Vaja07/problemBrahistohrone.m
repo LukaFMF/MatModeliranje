@@ -1,7 +1,8 @@
 T1 = [1; 5];
 T2 = [7; 3];
-cas = brahistohrona(T1,T2,false);
-
+casPoPremici = poPremici(T1,T2,true);
+casPoParaboli = poParaboli(T1,T2,true);
+cas = brahistohrona(T1,T2,true,false);
 % kviz 
 format long;
 A = 93;
@@ -9,18 +10,15 @@ T1 = [0;0];
 T2 = [5 + A/100;-2];
 T3 = [8;-5];
 
-razdalija = norm(T3 - T2,2);
-kot = atan((T2(2) - T3(2))/(T3(1) - T2(1)));
-a = 9.8*sin(kot);
-% x = x_0 + v_0*t + a_0/2*t^2 
-poPremici = brahistohrona(T1,T2,false) + sqrt(2*razdalija/a)
-spremebmaPoDvehBrahistohronah = abs(brahistohrona(T1,T2,false) + brahistohrona(T2,T3,false) - poPremici)
+sePoPremici = brahistohrona(T1,T2,false,false) + poPremici(T2,T3,false)
 
-brahistohrona(T1,T2,true);
+spremebmaPoDvehBrahistohronah = abs(brahistohrona(T1,T2,false,false) + brahistohrona(T2,T3,false,false) - sePoPremici)
+
+brahistohrona(T1,T2,false,true);
 
 format short;
 
-function cas = brahistohrona(T1,T2,midpoint)
+function cas = brahistohrona(T1,T2,g,midpoint)
 	% function cas = brahistohrona(T1,T2)
 	% 
 	% Funkcija narise brahistohrono za robni tocki T1 in T2 in vrne cas potovanja kroglice po njej.
@@ -45,8 +43,8 @@ function cas = brahistohrona(T1,T2,midpoint)
 	[theta,k] = poisciOpt_theta_k(nizja(1),nizja(2));
 	
 	% definiramo diskr. vrednosti parametricne krivulje v odvisnosti od parametra theta
-	x = @(t) k.^2*(t - sin(2*t)/2) + minus(1); 
-	y = @(t) -k.^2*sin(t).^2 + minus(2);
+	x = @(th) .5*k.^2*(th - sin(th)) + minus(1);
+	y = @(th) -.5*k.^2*(1 - cos(th)) + minus(2);
 
 	if midpoint
 		srednja = (T2(2) + T1(2))/2;
@@ -63,9 +61,11 @@ function cas = brahistohrona(T1,T2,midpoint)
 	end
 
 	% narisemo krivuljo
-	t = linspace(0,theta/2); % theta = 2*t => t = theta/2
-	plot(x(t),y(t));
-	axis equal;grid on;
+	if g
+		th = linspace(0,theta);
+		plot(x(th),y(th));
+		hold on;axis equal;grid on;
+	end
 	cas = k/sqrt(2*9.8)*theta;
 end
 
@@ -83,3 +83,61 @@ function [theta,k] = poisciOpt_theta_k(b,B)
 	theta = fzero(g,2);
 	k = sqrt(2*b/(theta - sin(theta)));
 end
+
+function cas = poPremici(T1,T2,g)
+	visja = [0;0];
+	nizja = [0;0];
+	minus = [0;0];
+	if T1(2) > T2(2)
+		minus = T1;
+		nizja = T2 - minus;
+	else
+		minus = T2;
+		nizja = T1 - minus;
+	end
+
+	kot = atan(-nizja(2)/nizja(1));
+	a = 9.8*sin(kot);
+	razdalija = norm(nizja,2);
+
+	if g
+		y = @(x) -kot*x;
+		x = linspace(0,nizja(1));
+		plot(x + minus(1),y(x) + minus(2));
+		hold on;axis equal;grid on;
+	end
+
+	% x = x_0 + v_0*t + a_0/2*t^2
+	cas = sqrt(2*razdalija/a);
+end
+
+function cas = poParaboli(T1,T2,g)
+	visja = [0;0];
+	nizja = [0;0];
+	minus = [0;0];
+	if T1(2) > T2(2)
+		minus = T1;
+		nizja = T2 - minus;
+	else
+		minus = T2;
+		nizja = T1 - minus;
+	end
+
+	% oblika: y = (x - nizja(1))^2/c + nizja(2) 
+	% pri pogoju y(0) = 0
+	% 0 = n(1)^2/c + n(2)
+	% -n(2) = n(1)^2/c
+	% 1/-n(2) = c/n(1)^2
+	c = nizja(1)^2/-nizja(2);
+	y = @(x) ((x - nizja(1)).^2)./c + nizja(2);
+	yPrime = @(x) (2*(x - nizja(1)))./c;
+
+	casPoti = @(x) sqrt((1 + yPrime(x).^2)./(-2*9.8*y(x)));
+
+	if g
+		x = linspace(0,nizja(1));
+		plot(x + minus(1),y(x) + minus(2));
+		hold on;axis equal;grid on;
+	end
+	cas = integral(casPoti,0,nizja(1));
+end 
