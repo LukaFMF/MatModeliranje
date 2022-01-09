@@ -1,3 +1,7 @@
+% 1) Dopolnite bernsteinPoly(n,j,t) in narišite Bernsteinove polinome stopnje 5.
+% 2) Dopolnite deCast(b,t). Narisite Bezierjevo krivuljo s kontrolnimi tockami bb = [1 2 3 4 3; 0 1 -2 1 1] preko de Casteljaujevega algoritma.
+% Dodatno: preverite, da dobite enako krivuljo tudi preko Bernsteinovih polinomov (malo lažje je, če preverite ujemanje krivulj samo pri kakšnem izbranem parametru t).
+% 3) Preko de Casteljaujevega algoritma narišite še prostorsko krivuljo s kontrolnimi točkami  bb = [1 2 3 4 3; 0 1 -2 1 1; 0 0 1 1 0]
 
 stopnja = 5;
 tocke = linspace(0,1);
